@@ -1,0 +1,39 @@
+# install packages and load data
+
+install.packages("tidyverse")
+library(tidyverse)
+install.packages("pacman")
+library(pacman)
+p_data(ggplot2)
+data(msleep) 
+
+#remove rows with na in sleep_rem
+mam_sleep <- msleep[ ! is.na(msleep$sleep_rem),]
+
+#order table by sleep hours
+sleep_time <- mam_sleep [order(-mam_sleep$sleep_total),]
+
+#view highest and lowest sleep_totals
+head(sleep_time)
+tail(sleep_time)
+
+#order by sleep_total
+mam_sleep [order(-mam_sleep$sleep_rem),]
+
+#create dataframe for highest sleep_time
+top_sleepers <- head(sleep_time)
+
+#create dataframe with data needed
+df1 = subset(mam_sleep, select = -c(genus, order,conservation, sleep_cycle:bodywt))
+
+#query for carnivores that sleep more than 8 hour
+## also this list happens to be my favorite animals 
+df2 = df1%>%
+        filter(vore == 'carni', sleep_total >= 8)%>%
+        arrange(-sleep_total)
+
+#create plot for carni sleep totals
+plot1 <- ggplot(data=df2, aes(x=name, y=sleep_total,fill=name)) + geom_bar(stat = "identity") 
+
+#adjust font to fit x axis
+Sleep_Totals_Carni <- plot1 + theme(axis.text.x = element_text(size = 5)) 
